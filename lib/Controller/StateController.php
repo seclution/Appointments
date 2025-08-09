@@ -77,6 +77,81 @@ class StateController extends Controller
             } else {
                 $r->setStatus(Http::STATUS_INTERNAL_SERVER_ERROR);
             }
+        } elseif ($action === 'duplicate_page') {
+            $pageId = $this->request->getParam("p", 'p0');
+            if (!is_string($pageId) || empty($pageId)) {
+                $r->setData('{"error": "bad pageId"}');
+                return $r;
+            }
+
+            try {
+                $loaded = $this->utils->loadSettingsForUserAndPage($this->userId, $pageId);
+            } catch (\Throwable $e) {
+                $this->logException($e);
+                $r->setStatus(Http::STATUS_INTERNAL_SERVER_ERROR);
+                return $r;
+            }
+            if (!$loaded) {
+                $r->setStatus(Http::STATUS_NOT_FOUND);
+                return $r;
+            }
+
+            try {
+                $pages = $this->utils->getUserPages($this->userId);
+            } catch (\Throwable $e) {
+                $this->logException($e);
+                $r->setStatus(Http::STATUS_INTERNAL_SERVER_ERROR);
+                return $r;
+            }
+
+            $pageCount = count($pages);
+            if ($pageCount > 2 && $this->config->getUserValue($this->userId, $this->appName, "cn" . "k") === '') {
+                $r->setStatus(Http::STATUS_ACCEPTED);
+                $r->setData(json_encode([
+                    "type" => 2,
+                    "message" => $this->l->t("More than 3 pages"),
+                ]));
+                return $r;
+            }
+
+            $pageNumbers = [];
+            for ($i = 0; $i < $pageCount; ++$i) {
+                $pageNumbers[] = intval(substr($pages[$i]['id'], 1));
+            }
+            sort($pageNumbers, SORT_NUMERIC);
+            $n = 0;
+            for ($i = 0, $c = count($pageNumbers); $i < $c; ++$i) {
+                $n = $pageNumbers[$i];
+                if ($i < $c - 1) {
+                    if ($n + 1 < $pageNumbers[$i + 1]) {
+                        ++$n;
+                        break;
+                    }
+                } else {
+                    ++$n;
+                }
+            }
+
+            $newPageId = 'p' . $n;
+            $settings = $this->utils->getUserSettings();
+            $settings[BackendUtils::PAGE_ENABLED] = false;
+            if (!empty($settings[BackendUtils::PAGE_LABEL])) {
+                $settings[BackendUtils::PAGE_LABEL] .= ' ' . $this->l->t('Copy');
+            } else {
+                $settings[BackendUtils::PAGE_LABEL] = $this->l->t('Public Page') . ' ' . $this->l->t('Copy');
+            }
+            $filtered = $this->utils->filterDefaultSettings($settings);
+            $count = $this->utils->createPage($this->userId, $newPageId, json_encode($filtered));
+            if ($count !== 1) {
+                $this->logger->warning('createPage returned ' . $count . ' , but expected 1');
+                $r->setStatus(Http::STATUS_ACCEPTED);
+                $r->setData(json_encode([
+                    "message" => $this->l->t("Create Page warning. Check logs."),
+                ]));
+            } else {
+                $r->setStatus(Http::STATUS_OK);
+                $r->setData(json_encode(['id' => $newPageId]));
+            }
         } elseif ($action === 'set_pages') {
             $pageId = $this->request->getParam("p", 'p0');
             if (!is_string($pageId) || empty($pageId)) {
