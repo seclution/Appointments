@@ -118,25 +118,7 @@ class StateController extends Controller
                 return $r;
             }
 
-            $pageNumbers = [];
-            for ($i = 0; $i < $pageCount; ++$i) {
-                $pageNumbers[] = intval(substr($pages[$i]['id'], 1));
-            }
-            sort($pageNumbers, SORT_NUMERIC);
-            $n = 0;
-            for ($i = 0, $c = count($pageNumbers); $i < $c; ++$i) {
-                $n = $pageNumbers[$i];
-                if ($i < $c - 1) {
-                    if ($n + 1 < $pageNumbers[$i + 1]) {
-                        ++$n;
-                        break;
-                    }
-                } else {
-                    ++$n;
-                }
-            }
-
-            $newPageId = 'p' . $n;
+            $newPageId = $this->findNextPageId($pages);
             $settings = $this->utils->getUserSettings();
             $settings[BackendUtils::PAGE_ENABLED] = false;
             if (!empty($settings[BackendUtils::PAGE_LABEL])) {
@@ -183,28 +165,7 @@ class StateController extends Controller
                     return $r;
                 }
 
-                // find first available page, ex 'p0', 'p1', 'p2', etc...
-                $pageNumbers = [];
-                for ($i = 0; $i < $pageCount; ++$i) {
-                    $pageNumbers[] = intval(substr($pages[$i]['id'], 1));
-                }
-                sort($pageNumbers, SORT_NUMERIC);
-                $n = 0;
-                for ($i = 0, $c = count($pageNumbers); $i < $c; ++$i) {
-                    $n = $pageNumbers[$i];
-                    if ($i < $c - 1) {
-                        // we have next
-                        if ($n + 1 < $pageNumbers[$i + 1]) {
-                            // we have a "hole" in $pageNumbers
-                            ++$n;
-                            break;
-                        }
-                    } else {
-                        ++$n;
-                    }
-                }
-
-                $newPageId = 'p' . $n;
+                $newPageId = $this->findNextPageId($pages);
                 $count = $this->utils->createPage($this->userId, $newPageId, json_encode([
                     "enabled" => false,
                     "label" => $this->l->t("Public Page"),
@@ -375,6 +336,29 @@ class StateController extends Controller
             }
         }
         return $r;
+    }
+
+
+    private function findNextPageId(array $pages): string
+    {
+        $pageNumbers = [];
+        for ($i = 0, $c = count($pages); $i < $c; ++$i) {
+            $pageNumbers[] = intval(substr($pages[$i]['id'], 1));
+        }
+        sort($pageNumbers, SORT_NUMERIC);
+        $n = 0;
+        for ($i = 0, $c = count($pageNumbers); $i < $c; ++$i) {
+            $n = $pageNumbers[$i];
+            if ($i < $c - 1) {
+                if ($n + 1 < $pageNumbers[$i + 1]) {
+                    ++$n;
+                    break;
+                }
+            } else {
+                ++$n;
+            }
+        }
+        return 'p' . $n;
     }
 
 
