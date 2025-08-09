@@ -11,6 +11,7 @@ import IconWeb from "vue-material-design-icons/Web.vue";
 import IconWebOff from "vue-material-design-icons/WebOff.vue";
 import IconDelete from "vue-material-design-icons/Delete.vue";
 import IconDirectory from "vue-material-design-icons/CardSearchOutline.vue";
+import IconCopy from "vue-material-design-icons/ContentCopy.vue";
 import {
 	NcActionButton,
 	NcActionInput,
@@ -71,14 +72,29 @@ const handleDeletePage = (pageId) => {
 }
 
 const handleAddNewPage = () => {
-	pagesStore.addNewPage(LOADING_PAGES).then(res => {
-		if (res.status === 202) {
-			emit('show-settings-modal', {
-				type: MODAL.CONTRIBUTION,
-				message: res.data.message
-			})
-		}
-	})
+        pagesStore.addNewPage(LOADING_PAGES).then(res => {
+                if (res.status === 202) {
+                        emit('show-settings-modal', {
+                                type: MODAL.CONTRIBUTION,
+                                message: res.data.message
+                        })
+                }
+        })
+}
+
+const handleDuplicatePage = (pageId) => {
+        pagesStore.duplicatePage(pageId, LOADING_PAGES).then(res => {
+                if (res !== null) {
+                        if (res.status === 202) {
+                                emit('show-settings-modal', {
+                                        type: res.data.type,
+                                        message: res.data.message
+                                })
+                        } else if (res.data && res.data.id) {
+                                emit('show-page', res.data.id)
+                        }
+                }
+        })
 }
 
 const handleEnablePage = (pageId) => {
@@ -148,20 +164,29 @@ const handleActionsMenu = (pageId, evt) => {
 							<IconPencil v-else :size="20"/>
 						</template>
 					</NcActionInput>
-					<NcActionButton
-							:disabled="!!pagesStore.loading"
-							@click="emit('show-settings',page.id)"
-							:close-after-click="true">
-						<template #icon>
-							<IconCog :size="20"/>
-						</template>
-						{{ t('appointments', 'Settings') }}
-					</NcActionButton>
-					<NcActionButton
-							:disabled="!!pagesStore.loading"
-							@click="handleDeletePage(page.id)"
-							:close-after-click="true">
-						<template #icon>
+                                        <NcActionButton
+                                                        :disabled="!!pagesStore.loading"
+                                                        @click="emit('show-settings',page.id)"
+                                                        :close-after-click="true">
+                                                <template #icon>
+                                                        <IconCog :size="20"/>
+                                                </template>
+                                                {{ t('appointments', 'Settings') }}
+                                        </NcActionButton>
+                                        <NcActionButton
+                                                        :disabled="!!pagesStore.loading"
+                                                        @click="handleDuplicatePage(page.id)"
+                                                        :close-after-click="true">
+                                                <template #icon>
+                                                        <IconCopy :size="20"/>
+                                                </template>
+                                                {{ t('appointments', 'Duplicate Page') }}
+                                        </NcActionButton>
+                                        <NcActionButton
+                                                        :disabled="!!pagesStore.loading"
+                                                        @click="handleDeletePage(page.id)"
+                                                        :close-after-click="true">
+                                                <template #icon>
 							<IconDelete :size="20"/>
 						</template>
 						{{ t('appointments', 'Delete Page') }}

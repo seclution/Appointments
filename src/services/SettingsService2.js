@@ -14,18 +14,25 @@ export default class SettingsService2 {
 		})
 	}
 
-	async addNewPage() {
-		return this.#sendRequest('set_pages', '_', CK.PAGES).catch(_ => {
-			showError(t('appointments', "Can't add new page. Check console"))
-			return null
-		})
-	}
+        async addNewPage() {
+                return this.#sendRequest('set_pages', '_', CK.PAGES).catch(_ => {
+                        showError(t('appointments', "Can't add new page. Check console"))
+                        return null
+                })
+        }
 
-	async deletePage(pageId) {
-		return this.#sendRequest('set_pages', pageId, CK.PAGES).catch(_ => {
-			showError(t('appointments', "Can't delete page. Check console"))
-			return null
-		})
+        async duplicatePage(pageId) {
+                return this.#sendRequest('duplicate_page', pageId, CK.PAGES).catch(_ => {
+                        showError(t('appointments', "Can't duplicate page. Check console"))
+                        return null
+                })
+        }
+
+        async deletePage(pageId) {
+                return this.#sendRequest('set_pages', pageId, CK.PAGES).catch(_ => {
+                        showError(t('appointments', "Can't delete page. Check console"))
+                        return null
+                })
 	}
 
 	async getPageUrl(pageId) {

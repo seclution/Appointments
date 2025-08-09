@@ -74,22 +74,34 @@ export const usePagesStore = defineStore('pages', {
 			})
 		},
 
-		async addNewPage(loading = LOADING_ANY) {
-			this.loading = loading
-			return settingsService.addNewPage().then(res => {
-				if (res !== null && res.status !== 202) {
-					this.getAllPages(loading)
-				} else {
-					this.loading = NOT_LOADING
-				}
-				return res
-			})
-		},
+                async addNewPage(loading = LOADING_ANY) {
+                        this.loading = loading
+                        return settingsService.addNewPage().then(res => {
+                                if (res !== null && res.status !== 202) {
+                                        this.getAllPages(loading)
+                                } else {
+                                        this.loading = NOT_LOADING
+                                }
+                                return res
+                        })
+                },
 
-		async deletePage(pageId, loading = LOADING_ANY) {
-			this.loading = loading
-			return settingsService.deletePage(pageId).then(res => {
-				if (res !== null) {
+                async duplicatePage(pageId, loading = LOADING_ANY) {
+                        this.loading = loading
+                        return settingsService.duplicatePage(pageId).then(res => {
+                                if (res !== null && res.status !== 202) {
+                                        this.getAllPages(loading)
+                                } else {
+                                        this.loading = NOT_LOADING
+                                }
+                                return res
+                        })
+                },
+
+                async deletePage(pageId, loading = LOADING_ANY) {
+                        this.loading = loading
+                        return settingsService.deletePage(pageId).then(res => {
+                                if (res !== null) {
 					if (res.status === 202 && res.data.message) {
 						showError(res.data.message)
 					}
