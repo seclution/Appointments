@@ -129,7 +129,6 @@ OC.L10N.register(
     "Save" : "Save",
     "Page URL" : "Page URL",
     "Show iframe/embeddable" : "Show iframe/embeddable",
-    "Copy" : "Copy",
     "Visit" : "Visit",
     "error: cannot load calendar data" : "error: cannot load calendar data",
     "Remove empty appointment slots created before {fullDate} ?" : "Remove empty appointment slots created before {fullDate} ?",
