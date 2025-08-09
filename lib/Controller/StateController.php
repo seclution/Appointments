@@ -83,6 +83,10 @@ class StateController extends Controller
                 $r->setData('{"error": "bad pageId"}');
                 return $r;
             }
+            if (!str_starts_with($pageId, 'p')) {
+                $r->setData('{"error": "bad pageId"}');
+                return $r;
+            }
 
             try {
                 $loaded = $this->utils->loadSettingsForUserAndPage($this->userId, $pageId);
@@ -218,6 +222,10 @@ class StateController extends Controller
                 }
 
             } else {
+                if (!str_starts_with($pageId, 'p')) {
+                    $r->setData('{"error": "bad pageId"}');
+                    return $r;
+                }
                 // delete the page if exists
                 try {
                     $pageExist = $this->utils->loadSettingsForUserAndPage($this->userId, $pageId);
@@ -268,6 +276,10 @@ class StateController extends Controller
             }
             if (empty($pageId)) {
                 $pageId = 'p0';
+            }
+            if (!str_starts_with($pageId, 'p')) {
+                $r->setData('{"error": "bad pageId"}');
+                return $r;
             }
 
             try {
