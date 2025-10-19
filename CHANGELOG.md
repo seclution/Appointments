@@ -1,3 +1,34 @@
+## v2.6.1 - 2025-10-15
+### Fixed
+- Form error handling = #628
+
+## v2.6.0 - 2025-10-07
+### Changed
+- Confirm/Cancel page now uses POST method - #627
+- Bump Axios version
+### Added
+- Option to add "bot protection" countdown timer/delay to the Confirm/Cancel button - #627
+- More logging for issue #626
+### Fixed
+- Form reset(bfcache) on Chrome when Back button is clicked
+
+## v2.5.0 - 2025-09-30
+### Changed
+- NC v31 is now min version
+- removed legacy code related to "X-APPT-DATA" prop
+### Fixed
+- tests code
+- NC v32 compatibility - #625
+- (re)confirmation error after date/time change by the organizer
+
+## v2.4.6 - 2025-09-01
+### Added
+- More logging on timezone related errors
+### Fixed
+- Undefined array key "remType" - #619
+### Changed
+- Removed `$(project_directory)/translationfiles` from build script as per new transifex flow
+
 ## v2.4.5 - 2025-06-03
 ### Fixed
 - Placeholder text not working in textarea - #600

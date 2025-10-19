@@ -289,7 +289,8 @@ class StateController extends Controller
 
                         // filter out cancellation reminders
                         foreach ($settings[BackendUtils::KEY_REMINDERS][BackendUtils::REMINDER_DATA] as $index => $remData) {
-                            if ($remData[BackendUtils::REMINDER_DATA_TYPE] !== BackendUtils::REMINDER_TYPE_APPT) {
+                            $remType = $remData[BackendUtils::REMINDER_DATA_TYPE] ?? BackendUtils::REMINDER_TYPE_APPT;
+                            if ($remType !== BackendUtils::REMINDER_TYPE_APPT) {
                                 unset($settings[BackendUtils::KEY_REMINDERS][BackendUtils::REMINDER_DATA][$index]);
                             }
                         }
@@ -619,7 +620,8 @@ class StateController extends Controller
 
                 $validDataCount = 0;
                 foreach ($valid[BackendUtils::REMINDER_DATA] as $v) {
-                    if ($v[BackendUtils::REMINDER_DATA_TYPE] === BackendUtils::REMINDER_TYPE_APPT) {
+                    $remType = $v[BackendUtils::REMINDER_DATA_TYPE] ?? BackendUtils::REMINDER_TYPE_APPT;
+                    if ($remType === BackendUtils::REMINDER_TYPE_APPT) {
                         $validDataCount++;
                     }
                 }
@@ -650,8 +652,8 @@ class StateController extends Controller
                     $reminders[BackendUtils::REMINDER_MORE_TEXT] = $this->regexRemoveScriptTag($value[BackendUtils::REMINDER_MORE_TEXT]);
                 }
 
-                if(is_bool($value[BackendUtils::REMINDER_SEND_ON_FRIDAY])){
-                    $reminders[BackendUtils::REMINDER_SEND_ON_FRIDAY]=$value[BackendUtils::REMINDER_SEND_ON_FRIDAY];
+                if (is_bool($value[BackendUtils::REMINDER_SEND_ON_FRIDAY])) {
+                    $reminders[BackendUtils::REMINDER_SEND_ON_FRIDAY] = $value[BackendUtils::REMINDER_SEND_ON_FRIDAY];
                 }
 
                 // because we have internal items in the BackendUtils::REMINDER_DATA array
@@ -900,7 +902,7 @@ class StateController extends Controller
                 'required' => false
             ]
         ];
-        $applyAttrs = function(array $allowed) use ($obj) {
+        $applyAttrs = function (array $allowed) use ($obj) {
             $out = '';
             foreach ($allowed as $attr => $default) {
                 if ($attr === 'required' && !empty($obj[$attr])) {
@@ -1050,7 +1052,7 @@ class StateController extends Controller
             $t_start = \DateTime::createFromFormat(
                 'j-m-Y H:i:s', $t . ' 00:00:00', $utz);
         } catch (\Exception $e) {
-            \OC::$server->getLogger()->error($e->getMessage() . ", timezone: " . $utz->getName());
+            $this->logger->error($e->getMessage() . ", timezone: " . $utz->getName());
             $r->setStatus(400);
             return $r;
         }
@@ -1114,7 +1116,7 @@ class StateController extends Controller
             $end = new \DateTime($rs, $utz);
 
         } catch (\Exception $e) {
-            \OC::$server->getLogger()->error($e->getMessage() . ", timezone: " . $utz->getName());
+            $this->logger->error($e->getMessage() . ", timezone: " . $utz->getName());
             $r->setStatus(400);
             return $r;
         }

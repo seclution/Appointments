@@ -10,14 +10,12 @@ use OCA\Appointments\Backend\BackendManager;
 use OCA\Appointments\Backend\BackendUtils;
 use OCA\Appointments\SendDataResponse;
 use OCP\AppFramework\Controller;
-use OCP\IConfig;
 use OCP\IRequest;
 
 class CalendarsController extends Controller
 {
 
     private $userId;
-    private $config;
     private $utils;
     /** @var \OCA\Appointments\Backend\IBackendConnector $bc */
     private $bc;
@@ -25,12 +23,10 @@ class CalendarsController extends Controller
     public function __construct($AppName,
                                 IRequest $request,
         $UserId,
-                                IConfig $config,
                                 BackendUtils $utils,
                                 BackendManager $backendManager) {
         parent::__construct($AppName, $request);
         $this->userId = $UserId;
-        $this->config = $config;
         $this->utils = $utils;
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->bc = $backendManager->getConnector();
@@ -67,7 +63,7 @@ class CalendarsController extends Controller
             $end = new \DateTime($rs, $utz);
 
         } catch (\Exception $e) {
-            \OC::$server->getLogger()->error($e->getMessage() . ", timezone: " . $utz->getName());
+            \OC::$server->get(\Psr\Log\LoggerInterface::class)->error($e->getMessage() . ", timezone: " . $utz->getName());
             $r->setStatus(400);
             return $r;
         }
@@ -144,7 +140,7 @@ class CalendarsController extends Controller
             $t_start = \DateTime::createFromFormat(
                 'j-m-Y H:i:s', $t . ' 00:00:00', $utz);
         } catch (\Exception $e) {
-            \OC::$server->getLogger()->error($e->getMessage() . ", timezone: " . $utz->getName());
+            \OC::$server->get(\Psr\Log\LoggerInterface::class)->error($e->getMessage() . ", timezone: " . $utz->getName());
             $r->setStatus(400);
             return $r;
         }
